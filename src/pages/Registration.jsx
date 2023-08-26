@@ -73,7 +73,7 @@ const Registration = () => {
             password:""
           })
           setload(false)
-          toast.success('🦄 Registration Done Please verify your email', {
+          toast.success(' Registration Done Please verify your email', {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
