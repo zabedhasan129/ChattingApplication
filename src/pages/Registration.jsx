@@ -42,7 +42,7 @@ const Registration = () => {
   let handleregistration =()=>{
     
     if(!formData.fullname){
-      setfullNameError("Fullname Required")
+      setfullNameError("Fullname Required fullname required")
     }else if(!formData.email){
       setEmailError("Email Required")
     }else if(!formData.password){
