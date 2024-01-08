@@ -51,7 +51,7 @@ const Msg = () => {
           (item.val().whosendid == data.activechatid && item.val().whorecivedid == userdata.uid))
           {
           // arr.push({...item.val(),mszid:item.key})
-          arr.push(item.val())
+          // arr.push(item.val())
           }
       
 
