@@ -4,7 +4,8 @@ import Image from '../components/Image'
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { Link,useNavigate } from 'react-router-dom';
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { getAuth,createUserWithEmailAndPassword,sendEmailVerification, updateProfile } from "firebase/auth";
+import { getDatabase, ref, set,push } from "firebase/database";
 import Alert from '@mui/material/Alert';
 import { AiFillEye,AiFillEyeInvisible } from 'react-icons/ai';
 import { RotatingLines } from 'react-loader-spinner';
@@ -12,8 +13,11 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
+
+
 const Registration = () => {
   const auth = getAuth();
+  const db = getDatabase();
   let navigate = useNavigate()
   
  let [formData,setformdata] = useState({
@@ -64,33 +68,42 @@ const Registration = () => {
         setPasswordError("Password not strong")
       }
       setload(true)
-      createUserWithEmailAndPassword(auth, formData.email, formData.password).then(()=>{
+      createUserWithEmailAndPassword(auth, formData.email, formData.password).then((user)=>{
 
-        sendEmailVerification(auth.currentUser).then(()=>{
-          setformdata({
-            fullname:"",
-            email:"",
-            password:""
-          })
-          setload(false)
-          toast.success(' Registration Done Please verify your email', {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
+        updateProfile(auth.currentUser, {
+          displayName: formData.fullname,
+          photoURL: "https://firebasestorage.googleapis.com/v0/b/chattingapplication-cb4e5.appspot.com/o/AvaTar.jpg?alt=media&token=4c3a6417-4374-43e6-aacd-a1af7d45d748"
+        }).then(()=>{
+          sendEmailVerification(auth.currentUser).then(()=>{
+            setformdata({
+              fullname:"",
+              email:"",
+              password:""
+            })
+            setload(false)
+            toast.success(' Registration Done Please verify your email', {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              });
+             setTimeout(()=>{
+              navigate("/login")
+              },1000)
+          }).then(()=>{
+            
+            set(ref(db, 'users/'+user.user.uid), {
+              username: formData.fullname,
+              email: formData.email,
+              profile_picture : "https://firebasestorage.googleapis.com/v0/b/chattingapplication-cb4e5.appspot.com/o/AvaTar.jpg?alt=media&token=4c3a6417-4374-43e6-aacd-a1af7d45d748"
             });
-           setTimeout(()=>{
-            navigate("/login")
-            },1000)
+          })
         })
-        
-
-      })
-      .catch((error) => {
+      }).catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
         if(errorCode.includes("email")){
@@ -142,7 +155,7 @@ const Registration = () => {
             visible={true}/>
             </Button>
             :
-            <Button onClick={handleregistration} claslaste='regbtn' variant="contained">Sign Up
+            <Button onClick={handleregistration} className='regbtn' variant="contained">Sign Up
             </Button>
             }
             <p>Already have an account ? <Link to="/Login" className='focus'>Sign In</Link></p>
